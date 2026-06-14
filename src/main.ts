@@ -7,12 +7,14 @@ import { AppModule } from './app.module';
 import { EnvironmentVariables } from './config/environment';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, { cors: true });
 	const logger = new Logger('Bootstrap');
 	const databaseConnection = app.get<Connection>(getConnectionToken());
 	const configService =
 		app.get<ConfigService<EnvironmentVariables, true>>(ConfigService);
 	const port = configService.get('PORT', { infer: true });
+
+	app.setGlobalPrefix('api');
 
 	logger.log(`MongoDB connected to database "${databaseConnection.name}"`);
 
