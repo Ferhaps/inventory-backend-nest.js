@@ -3,7 +3,7 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { getLogsBodySchema } from './log.schemas';
 import { LogService } from './log.service';
 import type { GetLogsBody } from './log.schemas';
-import type { LogDto } from './log.service';
+import type { LogDto } from './types';
 
 @Controller('/log')
 export class LogController {

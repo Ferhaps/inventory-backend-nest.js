@@ -1,19 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { User } from '../users/user.schema';
-
-export const LOG_EVENTS = [
-	'CATEGORY_CREATE',
-	'CATEGORY_DELETE',
-	'PRODUCT_CREATE',
-	'PRODUCT_DELETE',
-	'PRODUCT_UPDATE',
-	'USER_DELETE',
-	'USER_LOGIN',
-	'USER_REGISTER',
-] as const;
-
-export type LogEvent = (typeof LOG_EVENTS)[number];
+import { LOG_EVENTS } from './types';
+import type { LogEvent } from './types';
 
 export type LogDocument = HydratedDocument<Log>;
 

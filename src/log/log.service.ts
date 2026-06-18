@@ -3,59 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from '../users/user.schema';
 import { GetLogsBody } from './log.schemas';
-import { LOG_EVENTS, Log, LogDocument } from './log.schema';
-import type { LogEvent } from './log.schema';
-
-export type LogDto = {
-	id: string;
-	timestamp: string;
-	event: string;
-	user?: {
-		id: string;
-		email: string;
-	};
-	product?: {
-		id: string;
-		name: string;
-	};
-	category?: {
-		id: string;
-		name: string;
-	};
-	details?: string;
-};
-
-type PopulatedUser = {
-	_id: Types.ObjectId;
-	email: string;
-};
-
-type LeanLog = {
-	_id: Types.ObjectId;
-	timestamp: Date;
-	event: string;
-	user?: Types.ObjectId | PopulatedUser | null;
-	product?: {
-		id: string;
-		name: string;
-	};
-	category?: {
-		id: string;
-		name: string;
-	};
-	details?: string;
-};
-
-type LogFilter = {
-	user?: Types.ObjectId;
-	'product.id'?: string;
-	'category.id'?: string;
-	event?: LogEvent;
-	timestamp?: {
-		$gte?: Date;
-		$lte?: Date;
-	};
-};
+import { Log, LogDocument } from './log.schema';
+import { LeanLog, LOG_EVENTS, LogDto, LogFilter, PopulatedUser } from './types';
 
 @Injectable()
 export class LogService {

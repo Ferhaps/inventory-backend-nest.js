@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LOG_EVENTS } from './log.schema';
+import { LOG_EVENTS } from './types';
 
 const optionalStringFilter = z.string().trim().min(1).optional();
 
