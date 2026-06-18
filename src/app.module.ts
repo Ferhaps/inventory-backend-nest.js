@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironment } from './config/environment';
 import { DatabaseModule } from './database/database.module';
+import { LogModule } from './log/log.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
@@ -17,6 +18,7 @@ import { UsersModule } from './users/users.module';
 		AuthModule,
 		CategoriesModule,
 		DatabaseModule,
+		LogModule,
 		ProductsModule,
 		UsersModule,
 	],
