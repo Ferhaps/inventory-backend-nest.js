@@ -44,11 +44,11 @@ function buildLogFilter(body: GetLogsBody): LogFilter {
 	}
 
 	if (body.product) {
-		filter['product.id'] = body.product;
+		filter['product.id'] = toObjectIdOrThrow(body.product, 'product');
 	}
 
 	if (body.category) {
-		filter['category.id'] = body.category;
+		filter['category.id'] = toObjectIdOrThrow(body.category, 'category');
 	}
 
 	if (body.event) {
@@ -56,15 +56,17 @@ function buildLogFilter(body: GetLogsBody): LogFilter {
 	}
 
 	if (body.startDate || body.endDate) {
-		filter.timestamp = {};
+		const timestamp: NonNullable<LogFilter['timestamp']> = {};
 
 		if (body.startDate) {
-			filter.timestamp.$gte = body.startDate;
+			timestamp.$gte = body.startDate;
 		}
 
 		if (body.endDate) {
-			filter.timestamp.$lte = body.endDate;
+			timestamp.$lte = body.endDate;
 		}
+
+		filter.timestamp = timestamp;
 	}
 
 	return filter;
@@ -76,15 +78,18 @@ function toLogDto(log: LeanLog): LogDto {
 		timestamp: log.timestamp.toISOString(),
 		event: log.event,
 		user: toUserDto(log.user),
-		product: log.product,
-		category: log.category,
+		product: toEntityDto(log.product),
+		category: toEntityDto(log.category),
 		details: log.details,
 	};
 }
 
 function toUserDto(user: LeanLog['user']): LogDto['user'] {
 	if (!user || user instanceof Types.ObjectId || !('email' in user)) {
-		return undefined;
+		return {
+			id: 'deleted',
+			email: 'User deleted',
+		};
 	}
 
 	return {
@@ -99,4 +104,15 @@ function toObjectIdOrThrow(value: string, fieldName: string): Types.ObjectId {
 	}
 
 	return new Types.ObjectId(value);
+}
+
+function toEntityDto(entity: LeanLog['product']): LogDto['product'] {
+	if (!entity) {
+		return undefined;
+	}
+
+	return {
+		id: entity.id.toString(),
+		name: entity.name,
+	};
 }

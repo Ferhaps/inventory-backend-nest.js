@@ -43,20 +43,20 @@ export type LeanLog = {
 	event: string;
 	user?: Types.ObjectId | PopulatedUser | null;
 	product?: {
-		id: string;
+		id: string | Types.ObjectId;
 		name: string;
 	};
 	category?: {
-		id: string;
+		id: string | Types.ObjectId;
 		name: string;
 	};
 	details?: string;
 };
 
-export type LogFilter = {
+export type LogFilter = Record<string, unknown> & {
 	user?: Types.ObjectId;
-	'product.id'?: string;
-	'category.id'?: string;
+	'product.id'?: Types.ObjectId;
+	'category.id'?: Types.ObjectId;
 	event?: LogEvent;
 	timestamp?: {
 		$gte?: Date;

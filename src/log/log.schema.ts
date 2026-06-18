@@ -9,10 +9,10 @@ export type LogDocument = HydratedDocument<Log>;
 @Schema({ _id: false })
 export class LogEntitySnapshot {
 	@Prop({
+		type: Types.ObjectId,
 		required: true,
-		trim: true,
 	})
-	id!: string;
+	id!: Types.ObjectId;
 
 	@Prop({
 		required: true,
