@@ -7,7 +7,9 @@ import {
 	Param,
 	Post,
 	Query,
+	Req,
 } from '@nestjs/common';
+import type { AuthenticatedRequest } from '../auth/jwt.strategy';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user-role.enum';
@@ -28,14 +30,21 @@ export class CategoriesController {
 	create(
 		@Query(new ZodValidationPipe(createCategoryQuerySchema))
 		query: CreateCategoryQuery,
+		@Req() request: AuthenticatedRequest,
 	): Promise<CategoryDto> {
-		return this.categoriesService.create({ name: query.categoryName });
+		return this.categoriesService.create(
+			{ name: query.categoryName },
+			request.user.sub,
+		);
 	}
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Roles(UserRole.ADMIN)
-	remove(@Param('id') id: string): Promise<void> {
-		return this.categoriesService.remove(id);
+	remove(
+		@Param('id') id: string,
+		@Req() request: AuthenticatedRequest,
+	): Promise<void> {
+		return this.categoriesService.remove(id, request.user.sub);
 	}
 }

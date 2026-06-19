@@ -4,7 +4,28 @@ import { Model, Types } from 'mongoose';
 import { User } from '../users/user.schema';
 import { GetLogsBody } from './log.schemas';
 import { Log, LogDocument } from './log.schema';
-import { LeanLog, LOG_EVENTS, LogDto, LogFilter, PopulatedUser } from './types';
+import {
+	LeanLog,
+	LOG_EVENTS,
+	LogDto,
+	LogEvent,
+	LogFilter,
+	PopulatedUser,
+} from './types';
+
+export type CreateLogInput = {
+	event: LogEvent;
+	user: string | Types.ObjectId;
+	product?: {
+		id: string | Types.ObjectId;
+		name: string;
+	};
+	category?: {
+		id: string | Types.ObjectId;
+		name: string;
+	};
+	details?: string;
+};
 
 @Injectable()
 export class LogService {
@@ -15,6 +36,16 @@ export class LogService {
 
 	getEvents(): string[] {
 		return [...LOG_EVENTS];
+	}
+
+	async create(input: CreateLogInput): Promise<void> {
+		await this.logModel.create({
+			event: input.event,
+			user: toObjectId(input.user, 'user'),
+			product: toLogEntitySnapshot(input.product, 'product'),
+			category: toLogEntitySnapshot(input.category, 'category'),
+			details: input.details,
+		});
 	}
 
 	async findByFilter(body: GetLogsBody): Promise<LogDto[]> {
@@ -104,6 +135,29 @@ function toObjectIdOrThrow(value: string, fieldName: string): Types.ObjectId {
 	}
 
 	return new Types.ObjectId(value);
+}
+
+function toObjectId(
+	value: string | Types.ObjectId,
+	fieldName: string,
+): Types.ObjectId {
+	return value instanceof Types.ObjectId
+		? value
+		: toObjectIdOrThrow(value, fieldName);
+}
+
+function toLogEntitySnapshot(
+	entity: CreateLogInput['product'],
+	fieldName: string,
+): { id: Types.ObjectId; name: string } | undefined {
+	if (!entity) {
+		return undefined;
+	}
+
+	return {
+		id: toObjectId(entity.id, fieldName),
+		name: entity.name,
+	};
 }
 
 function toEntityDto(entity: LeanLog['product']): LogDto['product'] {

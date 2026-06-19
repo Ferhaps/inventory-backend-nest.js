@@ -9,7 +9,9 @@ import {
 	Patch,
 	Post,
 	Query,
+	Req,
 } from '@nestjs/common';
+import type { AuthenticatedRequest } from '../auth/jwt.strategy';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user-role.enum';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -37,8 +39,9 @@ export class ProductsController {
 	create(
 		@Body(new ZodValidationPipe(createProductBodySchema))
 		body: CreateProductBody,
+		@Req() request: AuthenticatedRequest,
 	): Promise<ProductDto> {
-		return this.productsService.create(body);
+		return this.productsService.create(body, request.user.sub);
 	}
 
 	@Patch(':id')
@@ -46,14 +49,22 @@ export class ProductsController {
 		@Param('id') id: string,
 		@Query(new ZodValidationPipe(updateProductQuantityQuerySchema))
 		query: UpdateProductQuantityQuery,
+		@Req() request: AuthenticatedRequest,
 	): Promise<ProductDto> {
-		return this.productsService.updateQuantity(id, query.quantity);
+		return this.productsService.updateQuantity(
+			id,
+			query.quantity,
+			request.user.sub,
+		);
 	}
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Roles(UserRole.ADMIN)
-	remove(@Param('id') id: string): Promise<void> {
-		return this.productsService.remove(id);
+	remove(
+		@Param('id') id: string,
+		@Req() request: AuthenticatedRequest,
+	): Promise<void> {
+		return this.productsService.remove(id, request.user.sub);
 	}
 }

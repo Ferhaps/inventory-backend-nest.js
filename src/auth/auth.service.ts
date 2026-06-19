@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { compare, hash } from 'bcrypt';
 import { Model } from 'mongoose';
+import { LogService } from '../log/log.service';
 import { User, UserDocument } from '../users/user.schema';
 import { LoginInput, RegisterInput } from './auth.schemas';
 import { JwtPayload } from './jwt.strategy';
@@ -30,6 +31,7 @@ export class AuthService {
 		@InjectModel(User.name)
 		private readonly userModel: Model<User>,
 		private readonly jwtService: JwtService,
+		private readonly logService: LogService,
 	) {}
 
 	async login(input: LoginInput): Promise<LoginResponse> {
@@ -50,13 +52,18 @@ export class AuthService {
 			role: responseUser.role,
 		};
 
+		await this.logService.create({
+			event: 'USER_LOGIN',
+			user: user._id,
+		});
+
 		return {
 			user: responseUser,
 			token: this.jwtService.sign(payload),
 		};
 	}
 
-	async register(input: RegisterInput): Promise<AuthUser> {
+	async register(input: RegisterInput, actorUserId: string): Promise<AuthUser> {
 		const email = normalizeEmail(input.email);
 		const password = await hash(
 			input.password,
@@ -68,6 +75,12 @@ export class AuthService {
 				email,
 				password,
 				role: input.role,
+			});
+
+			await this.logService.create({
+				event: 'USER_REGISTER',
+				user: actorUserId,
+				details: `Registered user ${user.email}`,
 			});
 
 			return toAuthUser(user);

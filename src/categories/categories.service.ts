@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { LogService } from '../log/log.service';
 import { Product, ProductDocument } from '../products/product.schema';
 import { Category, CategoryDocument } from './category.schema';
 
@@ -26,6 +27,7 @@ export class CategoriesService {
 		private readonly categoryModel: Model<CategoryDocument>,
 		@InjectModel(Product.name)
 		private readonly productModel: Model<ProductDocument>,
+		private readonly logService: LogService,
 	) {}
 
 	async findAll(): Promise<CategoryDto[]> {
@@ -37,7 +39,10 @@ export class CategoriesService {
 		return categories.map(toCategoryDto);
 	}
 
-	async create(input: CreateCategoryInput): Promise<CategoryDto> {
+	async create(
+		input: CreateCategoryInput,
+		actorUserId: string,
+	): Promise<CategoryDto> {
 		const normalizedName = normalizeCategoryName(input.name);
 
 		const existingCategory = await this.categoryModel
@@ -53,6 +58,16 @@ export class CategoriesService {
 			const category = await this.categoryModel.create({
 				name: normalizedName,
 			});
+
+			await this.logService.create({
+				event: 'CATEGORY_CREATE',
+				user: actorUserId,
+				category: {
+					id: category._id,
+					name: category.name,
+				},
+			});
+
 			return toCategoryDto(category);
 		} catch (error: unknown) {
 			if (isDuplicateKeyError(error)) {
@@ -63,14 +78,40 @@ export class CategoriesService {
 		}
 	}
 
-	async remove(id: string): Promise<void> {
+	async remove(id: string, actorUserId: string): Promise<void> {
 		const result = await this.categoryModel.findByIdAndDelete(id).exec();
 
 		if (!result) {
 			throw new NotFoundException(`Category with id ${id} not found`);
 		}
 
+		const products = await this.productModel
+			.find({ category: result._id })
+			.select('_id name')
+			.exec();
+
 		await this.productModel.deleteMany({ category: result._id }).exec();
+
+		await Promise.all([
+			this.logService.create({
+				event: 'CATEGORY_DELETE',
+				user: actorUserId,
+				category: {
+					id: result._id,
+					name: result.name,
+				},
+			}),
+			...products.map((product) =>
+				this.logService.create({
+					event: 'PRODUCT_DELETE',
+					user: actorUserId,
+					product: {
+						id: product._id,
+						name: product.name,
+					},
+				}),
+			),
+		]);
 	}
 }
 

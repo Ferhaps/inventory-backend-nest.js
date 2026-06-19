@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { LogService } from '../log/log.service';
 import { UserRole } from './user-role.enum';
 import { User, UserDocument } from './user.schema';
 
@@ -14,6 +15,7 @@ export type UserDto = {
 export class UsersService {
 	constructor(
 		@InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+		private readonly logService: LogService,
 	) {}
 
 	async findAll(): Promise<UserDto[]> {
@@ -25,10 +27,16 @@ export class UsersService {
 		}));
 	}
 
-	async remove(id: string): Promise<void> {
+	async remove(id: string, actorUserId: string): Promise<void> {
 		const result = await this.userModel.findByIdAndDelete(id).exec();
 		if (!result) {
 			throw new NotFoundException(`User with id ${id} not found`);
 		}
+
+		await this.logService.create({
+			event: 'USER_DELETE',
+			user: actorUserId,
+			details: `Deleted user ${result.email}`,
+		});
 	}
 }

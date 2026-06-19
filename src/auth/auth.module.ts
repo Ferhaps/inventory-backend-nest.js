@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { EnvironmentVariables } from '../config/environment';
+import { LogModule } from '../log/log.module';
 import { User, UserSchema } from '../users/user.schema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -15,6 +16,7 @@ import { RolesGuard } from './roles.guard';
 @Module({
 	imports: [
 		PassportModule,
+		LogModule,
 		MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
 		JwtModule.registerAsync({
 			inject: [ConfigService],
