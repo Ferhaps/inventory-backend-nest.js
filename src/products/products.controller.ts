@@ -25,8 +25,11 @@ import type {
 } from './product.schemas';
 import { ProductsService } from './products.service';
 import type { ProductDto } from './products.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('/products')
+@ApiTags('Products')
+@ApiBearerAuth('bearer')
 export class ProductsController {
 	constructor(private readonly productsService: ProductsService) {}
 

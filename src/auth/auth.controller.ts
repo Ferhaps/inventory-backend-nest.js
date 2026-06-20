@@ -7,13 +7,16 @@ import { AuthService, AuthUser, LoginResponse } from './auth.service';
 import type { AuthenticatedRequest } from './jwt.strategy';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
 	@Public()
 	@Post('login')
+	@ApiOperation({ summary: 'Login and receive a JWT access token' })
 	login(
 		@Body(new ZodValidationPipe(loginSchema)) input: LoginInput,
 	): Promise<LoginResponse> {
@@ -22,6 +25,8 @@ export class AuthController {
 
 	@Roles(UserRole.ADMIN)
 	@Post('register')
+	@ApiBearerAuth('bearer')
+	@ApiOperation({ summary: 'Register a new user (admin only)' })
 	register(
 		@Body(new ZodValidationPipe(registerSchema)) input: RegisterInput,
 		@Req() request: AuthenticatedRequest,

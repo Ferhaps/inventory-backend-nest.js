@@ -16,8 +16,11 @@ import { UserRole } from '../users/user-role.enum';
 import { createCategoryQuerySchema } from './category.schemas';
 import { CategoriesService, CategoryDto } from './categories.service';
 import type { CreateCategoryQuery } from './category.schemas';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('/categories')
+@ApiTags('Categories')
+@ApiBearerAuth('bearer')
 export class CategoriesController {
 	constructor(private readonly categoriesService: CategoriesService) {}
 

@@ -44,6 +44,16 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## API documentation (Swagger)
+
+After starting the app, open:
+
+- `http://localhost:<PORT>/api/docs` for Swagger UI
+- `http://localhost:<PORT>/api/docs-json` for the OpenAPI JSON document
+
+The docs are configured with a Bearer JWT scheme. Use the token from
+`POST /api/auth/login` in the **Authorize** button.
+
 ## Run tests
 
 ```bash

@@ -11,8 +11,11 @@ import type { AuthenticatedRequest } from '../auth/jwt.strategy';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from './user-role.enum';
 import { UserDto, UsersService } from './users.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('/users')
+@ApiTags('Users')
+@ApiBearerAuth('bearer')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 

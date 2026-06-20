@@ -5,6 +5,7 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { AppModule } from './app.module';
 import { EnvironmentVariables } from './config/environment';
+import { setupSwagger } from './config/swagger';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, { cors: true });
@@ -15,6 +16,7 @@ async function bootstrap() {
 	const port = configService.get('PORT', { infer: true });
 
 	app.setGlobalPrefix('api');
+	setupSwagger(app);
 
 	logger.log(`MongoDB connected to database "${databaseConnection.name}"`);
 

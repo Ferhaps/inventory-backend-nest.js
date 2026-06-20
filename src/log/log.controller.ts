@@ -4,8 +4,11 @@ import { getLogsBodySchema } from './log.schemas';
 import { LogService } from './log.service';
 import type { GetLogsBody } from './log.schemas';
 import type { LogDto } from './types';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('/log')
+@ApiTags('Log')
+@ApiBearerAuth('bearer')
 export class LogController {
 	constructor(private readonly logService: LogService) {}
 
