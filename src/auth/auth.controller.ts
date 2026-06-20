@@ -7,7 +7,29 @@ import { AuthService, AuthUser, LoginResponse } from './auth.service';
 import type { AuthenticatedRequest } from './jwt.strategy';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiOperation,
+	ApiProperty,
+	ApiTags,
+} from '@nestjs/swagger';
+
+class LoginBodyDto {
+	@ApiProperty({
+		example: 'operator@inventory.local',
+		description: 'User email address',
+	})
+	email!: string;
+
+	@ApiProperty({ example: 'P@ssw0rd!' })
+	password!: string;
+}
+
+class RegisterBodyDto extends LoginBodyDto {
+	@ApiProperty({ enum: UserRole, example: UserRole.OPERATOR })
+	role!: UserRole;
+}
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -17,6 +39,7 @@ export class AuthController {
 	@Public()
 	@Post('login')
 	@ApiOperation({ summary: 'Login and receive a JWT access token' })
+	@ApiBody({ type: LoginBodyDto })
 	login(
 		@Body(new ZodValidationPipe(loginSchema)) input: LoginInput,
 	): Promise<LoginResponse> {
@@ -27,6 +50,7 @@ export class AuthController {
 	@Post('register')
 	@ApiBearerAuth('bearer')
 	@ApiOperation({ summary: 'Register a new user (admin only)' })
+	@ApiBody({ type: RegisterBodyDto })
 	register(
 		@Body(new ZodValidationPipe(registerSchema)) input: RegisterInput,
 		@Req() request: AuthenticatedRequest,

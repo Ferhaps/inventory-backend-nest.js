@@ -16,7 +16,7 @@ import { UserRole } from '../users/user-role.enum';
 import { createCategoryQuerySchema } from './category.schemas';
 import { CategoriesService, CategoryDto } from './categories.service';
 import type { CreateCategoryQuery } from './category.schemas';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('/categories')
 @ApiTags('Categories')
@@ -30,6 +30,12 @@ export class CategoriesController {
 	}
 
 	@Post()
+	@ApiQuery({
+		name: 'categoryName',
+		required: true,
+		type: String,
+		description: 'Category display name',
+	})
 	create(
 		@Query(new ZodValidationPipe(createCategoryQuerySchema))
 		query: CreateCategoryQuery,
@@ -44,6 +50,7 @@ export class CategoriesController {
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Roles(UserRole.ADMIN)
+	@ApiParam({ name: 'id' })
 	remove(
 		@Param('id') id: string,
 		@Req() request: AuthenticatedRequest,

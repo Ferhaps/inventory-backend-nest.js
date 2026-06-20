@@ -25,7 +25,25 @@ import type {
 } from './product.schemas';
 import { ProductsService } from './products.service';
 import type { ProductDto } from './products.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiParam,
+	ApiProperty,
+	ApiQuery,
+	ApiTags,
+} from '@nestjs/swagger';
+
+class CreateProductBodyDto {
+	@ApiProperty({ example: 'Wireless Mouse' })
+	name!: string;
+
+	@ApiProperty({ example: '6869bb4a4fa3b392b0cbab1a' })
+	categoryId!: string;
+
+	@ApiProperty({ example: 25, minimum: 0 })
+	quantity!: number;
+}
 
 @Controller('/products')
 @ApiTags('Products')
@@ -39,6 +57,7 @@ export class ProductsController {
 	}
 
 	@Post()
+	@ApiBody({ type: CreateProductBodyDto })
 	create(
 		@Body(new ZodValidationPipe(createProductBodySchema))
 		body: CreateProductBody,
@@ -48,6 +67,14 @@ export class ProductsController {
 	}
 
 	@Patch(':id')
+	@ApiParam({ name: 'id', example: '6869bb4a4fa3b392b0cbab1a' })
+	@ApiQuery({
+		name: 'quantity',
+		required: true,
+		type: Number,
+		example: 15,
+		description: 'New inventory quantity (must be >= 0)',
+	})
 	updateQuantity(
 		@Param('id') id: string,
 		@Query(new ZodValidationPipe(updateProductQuantityQuerySchema))
@@ -64,6 +91,7 @@ export class ProductsController {
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Roles(UserRole.ADMIN)
+	@ApiParam({ name: 'id', example: '6869bb4a4fa3b392b0cbab1a' })
 	remove(
 		@Param('id') id: string,
 		@Req() request: AuthenticatedRequest,
