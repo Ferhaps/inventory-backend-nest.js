@@ -10,8 +10,9 @@ import {
 import type { AuthenticatedRequest } from '../auth/jwt.strategy';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from './user-role.enum';
-import { UserDto, UsersService } from './users.service';
+import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { UserDto } from './user.dto';
 
 @Controller('/users')
 @ApiTags('Users')

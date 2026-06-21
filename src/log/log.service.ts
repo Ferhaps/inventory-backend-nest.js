@@ -108,14 +108,14 @@ function toLogDto(log: LeanLog): LogDto {
 		id: log._id.toString(),
 		timestamp: log.timestamp.toISOString(),
 		event: log.event,
-		user: toUserDto(log.user),
+		user: toLogUserDto(log.user),
 		product: toEntityDto(log.product),
 		category: toEntityDto(log.category),
 		details: log.details,
 	};
 }
 
-function toUserDto(user: LeanLog['user']): LogDto['user'] {
+function toLogUserDto(user: LeanLog['user']): LogDto['user'] {
 	if (!user || user instanceof Types.ObjectId || !('email' in user)) {
 		return {
 			id: 'deleted',

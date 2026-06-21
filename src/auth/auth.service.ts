@@ -8,18 +8,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { compare, hash } from 'bcrypt';
 import { Model } from 'mongoose';
 import { LogService } from '../log/log.service';
-import { User, UserDocument } from '../users/user.schema';
+import { User } from '../users/user.schema';
 import { LoginInput, RegisterInput } from './auth.schemas';
 import { JwtPayload } from './jwt.strategy';
-
-export type AuthUser = {
-	id: string;
-	email: string;
-	role: User['role'];
-};
+import { toUserDto, type UserDto } from 'src/users/user.dto';
 
 export type LoginResponse = {
-	user: AuthUser;
+	user: UserDto;
 	token: string;
 };
 
@@ -45,7 +40,7 @@ export class AuthService {
 			throw new UnauthorizedException('Invalid email or password');
 		}
 
-		const responseUser = toAuthUser(user);
+		const responseUser = toUserDto(user);
 		const payload: JwtPayload = {
 			sub: responseUser.id,
 			email: responseUser.email,
@@ -63,7 +58,7 @@ export class AuthService {
 		};
 	}
 
-	async register(input: RegisterInput, actorUserId: string): Promise<AuthUser> {
+	async register(input: RegisterInput, actorUserId: string): Promise<UserDto> {
 		const email = normalizeEmail(input.email);
 		const password = await hash(
 			input.password,
@@ -83,7 +78,7 @@ export class AuthService {
 				details: `Registered user ${user.email}`,
 			});
 
-			return toAuthUser(user);
+			return toUserDto(user);
 		} catch (error: unknown) {
 			if (isDuplicateKeyError(error)) {
 				throw new ConflictException('Email is already registered');
@@ -96,14 +91,6 @@ export class AuthService {
 
 function normalizeEmail(email: string): string {
 	return email.trim().toLowerCase();
-}
-
-function toAuthUser(user: UserDocument): AuthUser {
-	return {
-		id: user._id.toString(),
-		email: user.email,
-		role: user.role,
-	};
 }
 
 function isDuplicateKeyError(error: unknown): error is { code: number } {

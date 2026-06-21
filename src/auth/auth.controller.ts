@@ -3,7 +3,7 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { UserRole } from '../users/user-role.enum';
 import { loginSchema, registerSchema } from './auth.schemas';
 import type { LoginInput, RegisterInput } from './auth.schemas';
-import { AuthService, AuthUser, LoginResponse } from './auth.service';
+import { AuthService, LoginResponse } from './auth.service';
 import type { AuthenticatedRequest } from './jwt.strategy';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
@@ -14,6 +14,7 @@ import {
 	ApiProperty,
 	ApiTags,
 } from '@nestjs/swagger';
+import type { UserDto } from 'src/users/user.dto';
 
 class LoginBodyDto {
 	@ApiProperty({
@@ -54,7 +55,7 @@ export class AuthController {
 	register(
 		@Body(new ZodValidationPipe(registerSchema)) input: RegisterInput,
 		@Req() request: AuthenticatedRequest,
-	): Promise<AuthUser> {
+	): Promise<UserDto> {
 		return this.authService.register(input, request.user.sub);
 	}
 }

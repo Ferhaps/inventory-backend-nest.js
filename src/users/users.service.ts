@@ -1,25 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { LogService } from '../log/log.service';
-import { UserRole } from './user-role.enum';
 import { User, UserDocument } from './user.schema';
-
-export type UserDto = {
-	id: string;
-	email: string;
-	role: UserRole;
-	createdAt: Date;
-	updatedAt: Date;
-};
-
-type UserListItem = {
-	_id: Types.ObjectId;
-	email: string;
-	role: UserRole;
-	createdAt: Date;
-	updatedAt: Date;
-};
+import type { UserDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,11 +16,13 @@ export class UsersService {
 		const users = await this.userModel
 			.find({}, { email: 1, role: 1, createdAt: 1, updatedAt: 1 })
 			.sort({ createdAt: -1 })
-			.lean<UserListItem[]>()
 			.exec();
 		return users.map((user) => ({
-			...user,
 			id: user._id.toString(),
+			email: user.email,
+			role: user.role,
+			createdAt: user.createdAt,
+			updatedAt: user.updatedAt,
 		}));
 	}
 
