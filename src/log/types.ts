@@ -63,3 +63,17 @@ export type LogFilter = Record<string, unknown> & {
 		$lte?: Date;
 	};
 };
+
+export type CreateLogInput = {
+	event: LogEvent;
+	user: string | Types.ObjectId;
+	product?: {
+		id: string | Types.ObjectId;
+		name: string;
+	};
+	category?: {
+		id: string | Types.ObjectId;
+		name: string;
+	};
+	details?: string;
+};

@@ -5,27 +5,13 @@ import { User } from '../users/user.schema';
 import { GetLogsBody } from './log.schemas';
 import { Log, LogDocument } from './log.schema';
 import {
+	CreateLogInput,
 	LeanLog,
 	LOG_EVENTS,
 	LogDto,
-	LogEvent,
 	LogFilter,
 	PopulatedUser,
 } from './types';
-
-export type CreateLogInput = {
-	event: LogEvent;
-	user: string | Types.ObjectId;
-	product?: {
-		id: string | Types.ObjectId;
-		name: string;
-	};
-	category?: {
-		id: string | Types.ObjectId;
-		name: string;
-	};
-	details?: string;
-};
 
 @Injectable()
 export class LogService {
