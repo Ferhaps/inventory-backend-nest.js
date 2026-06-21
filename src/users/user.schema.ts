@@ -23,6 +23,9 @@ export class User {
 		enum: Object.values(UserRole),
 	})
 	role!: UserRole;
+
+	createdAt!: Date;
+	updatedAt!: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

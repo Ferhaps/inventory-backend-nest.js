@@ -27,7 +27,7 @@ export class UsersController {
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Roles(UserRole.ADMIN)
-	@ApiParam({ name: 'id', example: '6869bb4a4fa3b392b0cbab1a' })
+	@ApiParam({ name: 'id' })
 	remove(
 		@Param('id') id: string,
 		@Req() request: AuthenticatedRequest,
