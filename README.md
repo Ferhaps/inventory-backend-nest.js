@@ -396,4 +396,4 @@ npm run test:cov
 
 ## License
 
-UNLICENSED
+MIT LICENSED
